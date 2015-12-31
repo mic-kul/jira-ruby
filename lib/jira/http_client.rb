@@ -13,6 +13,15 @@ module JIRA
     attr_reader :options
 
     def initialize(options)
+      # hack
+      (Net::HTTP::SSL_IVNAMES << :@ssl_options).uniq!
+      (Net::HTTP::SSL_ATTRIBUTES << :options).uniq!
+
+      Net::HTTP.class_eval do
+        attr_accessor :ssl_options
+      end
+
+      # /hack
       @options = DEFAULT_OPTIONS.merge(options)
       @cookies = {}
     end
@@ -41,6 +50,10 @@ module JIRA
       http_conn.use_ssl = @options[:use_ssl]
       http_conn.verify_mode = @options[:ssl_verify_mode]
       http_conn.read_timeout = @options[:read_timeout]
+      if @options[:use_ssl]
+        options_mask = OpenSSL::SSL::OP_NO_SSLv2 + OpenSSL::SSL::OP_NO_SSLv3 + OpenSSL::SSL::OP_NO_COMPRESSION
+        http.ssl_options = options_mask
+      end
       http_conn
     end
 
