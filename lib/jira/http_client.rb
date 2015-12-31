@@ -52,7 +52,7 @@ module JIRA
       http_conn.read_timeout = @options[:read_timeout]
       if @options[:use_ssl]
         options_mask = OpenSSL::SSL::OP_NO_SSLv2 + OpenSSL::SSL::OP_NO_SSLv3 + OpenSSL::SSL::OP_NO_COMPRESSION
-        http.ssl_options = options_mask
+        http_conn.ssl_options = options_mask
       end
       http_conn
     end
